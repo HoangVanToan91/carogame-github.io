@@ -5,14 +5,26 @@ let gameActive = true;
 
 let currentPlayer = 'X';
 
-let gameState = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
+// let gameState = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
 
+let gameState = [
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", "", "", ""]
+]
 const winningMessage = () => `Player ${currentPlayer} win!`;
 const drawMessage = () => `Game draw`;
 const currentPlayerTurn = () => `Not turn for ${currentPlayer}`;
 
 statusDisplay.innerHTML = currentPlayerTurn();
-
+/*
 const winningConditions = [
     [0, 1, 2, 3, 4],
     [1, 2, 3, 4, 5],
@@ -204,10 +216,14 @@ const winningConditions = [
     [59, 68, 77, 86, 95],
     [69, 78, 87, 96]
 ];
-
+*/
 function handleCellPlayed(clickedCell, clickedCellIndex) {
-    
-    gameState[clickedCellIndex] = currentPlayer;
+    // gameState[clickedCellIndex] = currentPlayer;
+    // clickedCell.innerHTML = currentPlayer;
+    // console.log("data: ", clickedCell, clickedCellIndex)
+    let rowIndex = clickedCellIndex % 10
+    let colIndex = Math.floor(clickedCellIndex / 10)
+    gameState[colIndex][rowIndex] = currentPlayer
     clickedCell.innerHTML = currentPlayer;
 }
 function handlePlayerChange() {
@@ -216,49 +232,117 @@ function handlePlayerChange() {
 }
 
 function handleResultValidation() {
-    let roundWon = false;
-    for (let i = 0; i <= 188; i++) {
-        const winCondition = winningConditions[i];
-        let a = gameState[winCondition[0]];
-        let b = gameState[winCondition[1]];
-        let c = gameState[winCondition[2]];
-        let d = gameState[winCondition[3]];
-        let e = gameState[winCondition[4]];
-        if (a === '' || b === '' || c === '' || d === '' || e === '') {
-            continue;
-        }
-        if (a === b && b === c && c === d && d === e) {
-            roundWon = true;
-            break
-        }
-    }
-    if (roundWon) {
-        statusDisplay.innerHTML = winningMessage();
-        gameActive = false;
-        return;
-    }
-    
-    let roundDraw = !gameState.includes("");
-    if (roundDraw) {
-        statusDisplay.innerHTML = drawMessage();
-        gameActive = false;
-        return;
+    // let roundWon = false;
+    // for (let i = 0; i <= 188; i++) {
+    //     const winCondition = winningConditions[i];
+    //     let a = gameState[winCondition[0]];
+    //     let b = gameState[winCondition[1]];
+    //     let c = gameState[winCondition[2]];
+    //     let d = gameState[winCondition[3]];
+    //     let e = gameState[winCondition[4]];
+    //     if (a === '' || b === '' || c === '' || d === '' || e === '') {
+    //         continue;
+    //     }
+    //     if (a === b && b === c && c === d && d === e) {
+    //         roundWon = true;
+    //         break
+    //     }
+    // }
+    // if (roundWon) {
+    //     statusDisplay.innerHTML = winningMessage();
+    //     gameActive = false;
+    //     return;
+    // }
 
-    }
-    
+    // let roundDraw = !gameState.includes("");
+    // if (roundDraw) {
+    //     statusDisplay.innerHTML = drawMessage();
+    //     gameActive = false;
+    //     return;
+
+    // }
+
+    checkWin()
     handlePlayerChange();
 }
 
+function checkWin() {
+    for (let i = 0; i < gameState.length; i++) {
+        for (let j = 0; j < gameState[i].length; j++) {
+            let currentValue = gameState[i][j]
+           
+            if (currentValue == "X" || currentValue == "O") {
+                // hang doc
+                let win = true;
+                for (let k = 1; k < 5; k++) {
+                    if (gameState[i + k][j] !== currentValue) {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win) {
+                    console.log("Win")
+                    gameActive = false
+                    return
+                }
+
+                // hang ngang
+                win = true;
+                for(let k = 1; k < 5; k++) {
+                    if (gameState[i][j+k] !== currentValue) {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win) {
+                    gameActive = false
+                    return
+                }
+
+                // cheo xuong
+                win = true;
+                for(let k = 1; k < 5; k++) {
+                    if (gameState[i+k][j+k] !== currentValue) {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win) {
+                    gameActive = false
+                    return
+                }
+
+                // cheo nguoc
+                win = true;
+                for(let k = 1; k < 5; k++) {
+                    if (gameState[i+k][j-k] !== currentValue) {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win) {
+                    gameActive = false
+                    return
+                }
+            }
+        }
+    }
+}
+
 function handleCellClick(clickedCellEvent) {
-    
+
     const clickedCell = clickedCellEvent.target;
-    
+
     const clickedCellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
-    
-    if (gameState[clickedCellIndex] !== "" || !gameActive) {
+
+    let rowIndex = clickedCellIndex % 10
+    let colIndex = Math.floor(clickedCellIndex / 10)
+
+    console.log(colIndex, rowIndex, gameState[colIndex][rowIndex])
+    if (gameState[colIndex][rowIndex] !== "" || !gameActive) {
         return;
     }
-   
+    console.log("go")
     handleCellPlayed(clickedCell, clickedCellIndex);
     handleResultValidation();
 }
